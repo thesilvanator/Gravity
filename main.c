@@ -6,7 +6,7 @@
 #include "render.h"
 
 #define PLANET_COUNT 3
-#define TIME_RATIO 2
+#define TIME_RATIO 3
 
 
 void update_forces(struct planet p[], int count) {
@@ -19,21 +19,15 @@ void update_forces(struct planet p[], int count) {
 			struct vec3 direction = sub_vectors(p[j].position, p[i].position);
 			real len = length(direction);
 
-			if(len < (real)(p[i].radius + p[j].radius)/2.0f) {
-				forces = add_vectors(forces, zero_vec());
+			// if planets too close, just don't add any force
+			if(len < (real)(p[i].radius + p[j].radius)/2.0f)
 				continue;
-			}
 
 			real force = GRAV_CONST*((p[i].mass*p[j].mass)/(len*len));
 			direction = normalize(direction);
 
 			forces = add_vectors(forces, scalar_product(direction, force));
 		}
-		if(length(forces) == 0.0f) {
-			p[i].acceleration = zero_vec();
-			continue;
-		}
-
 		// a = f/m
 		struct vec3 direction = normalize(forces);
 		real accel = length(forces)/(real)p[i].mass;
@@ -43,8 +37,8 @@ void update_forces(struct planet p[], int count) {
 
 void update_positions(struct planet p[], int count, double delta) {
 	for(int i = 0; i < count; i++) {
-		p[i].velocity = add_vectors(p[i].velocity, scalar_product(p[i].acceleration, 1));
-		p[i].position = add_vectors(p[i].position, scalar_product(p[i].velocity, (real)delta * 1));
+		p[i].velocity = add_vectors(p[i].velocity, scalar_product(p[i].acceleration, (real)delta * TIME_RATIO));
+		p[i].position = add_vectors(p[i].position, scalar_product(p[i].velocity, (real)delta * TIME_RATIO));
 	}
 }
 
@@ -55,16 +49,19 @@ void render(SDL_Window* win, SDL_Renderer* r, struct planet p[], int count) {
 		draw_circle(win, r, p[i].position, p[i].radius);
 	}
 
-	// printf("planet 0 position x: %f, y: %f\n", p[0].position.x, p[0].position.y);
-	// printf("planet 1 position x: %f, y: %f\n", p[1].position.x, p[1].position.y);
-	// printf("planet 2 position x: %f, y: %f\n", p[2].position.x, p[2].position.y);
+	SDL_RenderPresent(r);
+
+	// for(int i = 0; i < count; i++) {
+	// 	printf("planet %d position x: %f, y: %f\n", i, p[i].position.x, p[i].position.y);
+	// }
+
 	// printf("planet distance: %f\n\n", length(sub_vectors(p[0].position, p[1].position)));
-	// printf("planet 0 acell:");
-	// print_vec(p[0].acceleration);
-	// printf("planet 1 acell:");
-	// print_vec(p[1].acceleration);
-	// printf("planet 2 acell:");
-	// print_vec(p[2].acceleration);
+
+	// for(int i = 0; i < count; i++){
+	// 	printf("planet %d acceleration:\n", i);
+	// 	print_vec(p[i].acceleration);
+	// }
+
 	// printf("---------------------------------\n\n");
 	// fflush(stdout);
 }
@@ -73,11 +70,11 @@ void render(SDL_Window* win, SDL_Renderer* r, struct planet p[], int count) {
 
 int main(int argc, char const *argv[])
 {
-	struct planet p[3];
+	struct planet p[PLANET_COUNT];
 	//create_planet(size, mass, pos, vel, accel)
-	p[0] = create_planet(.5,5.0f, zero_vec(),zero_vec(),zero_vec());
-	p[1] = create_planet(0.8, 2.5f, create_vec(5, 1, 0), create_vec(0, 0.5f,0), zero_vec());
-	p[2] = create_planet(0.5, 1.0f, create_vec(-8, 3, 0), zero_vec(), zero_vec());
+	p[0] = create_planet(.9, 50.0f, zero_vec(),zero_vec(),zero_vec());
+	p[1] = create_planet(0.5, 25.0f, create_vec(5, -2, 0), create_vec(0, 0.5f,0), zero_vec());
+	p[2] = create_planet(0.25, 10.0f, create_vec(-8, 5, 0), zero_vec(), zero_vec());
 
 
 	// init SDL
@@ -97,7 +94,6 @@ int main(int argc, char const *argv[])
 	SDL_SetRenderDrawColor(r,0,0,30,0);
 	SDL_RenderClear(r);
 	SDL_RenderPresent(r);
-
 
 
 	int quit = 0;
@@ -126,14 +122,9 @@ int main(int argc, char const *argv[])
 	    			quit = !quit;
 		}
 		render(w, r, p, PLANET_COUNT);
-		SDL_RenderPresent(r);
 	}
 
-
-
-
-
-	printf(" Done.\n");
+	printf("Done.\n");
 	SDL_DestroyWindow(w);
 	SDL_Quit();
 	return 0;

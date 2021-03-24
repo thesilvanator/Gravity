@@ -87,6 +87,9 @@ real length(struct vec3 vec) {
 
 struct vec3 normalize(struct vec3 vec) {
 	real l = length(vec);
+	if(l == 0)
+		return zero_vec();
+
 	return scalar_product(vec, (real)1/l);
 }
 
