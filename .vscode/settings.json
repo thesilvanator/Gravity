@@ -41,7 +41,9 @@
 		"*.tcc": "cpp",
 		"ranges": "cpp",
 		"stdexcept": "cpp",
-		"tuple": "cpp"
+		"tuple": "cpp",
+		"_stdio.h": "c",
+		"cdefs.h": "c"
 	},
 	"C_Cpp.dimInactiveRegions": true
 }
