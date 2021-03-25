@@ -49,6 +49,8 @@ void render(SDL_Window* win, SDL_Renderer* r, struct planet p[], int count) {
 		draw_circle(win, r, p[i].position, p[i].radius);
 	}
 
+	draw_velocity_arrows(win, r, p, count);
+
 	SDL_RenderPresent(r);
 
 	// for(int i = 0; i < count; i++) {
@@ -75,7 +77,6 @@ int main(int argc, char const *argv[])
 	p[0] = create_planet(.9, 50.0f, zero_vec(),zero_vec(),zero_vec());
 	p[1] = create_planet(0.5, 25.0f, create_vec(5, -2, 0), create_vec(0, 0.5f,0), zero_vec());
 	p[2] = create_planet(0.25, 10.0f, create_vec(-8, 5, 0), zero_vec(), zero_vec());
-
 
 	// init SDL
 	if(SDL_Init(SDL_INIT_EVERYTHING)) {
