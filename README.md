@@ -11,5 +11,5 @@ A simple 2D gravity simulator written in pure C.
 * Add 3D support
 * Add debug with force/acceleration, and velocity vectors rendered on screen
 
-![Gif of Program](./gif.fig "Gif of Program")
+![Gif of Program](./gif.gif "Gif of Program")
 ![Screenshot of Program](./img.png "Screenshot of Program")
