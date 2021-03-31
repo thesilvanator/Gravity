@@ -10,6 +10,7 @@
 
 
 void update_forces(struct planet p[], int count) {
+	struct vec3 planet_forces[count];
 	for(int i = 0; i < count; i++) {
 		struct vec3 forces = zero_vec();
 		for(int j = 0; j < count; j++) {
@@ -20,7 +21,7 @@ void update_forces(struct planet p[], int count) {
 			real len = length(direction);
 
 			// if planets too close, just don't add any force
-			if(len < (real)(p[i].radius + p[j].radius)/2.0f)
+			if(len < (real)(p[i].radius + p[j].radius)/2.0)
 				continue;
 
 			real force = GRAV_CONST*((p[i].mass*p[j].mass)/(len*len));
@@ -28,9 +29,12 @@ void update_forces(struct planet p[], int count) {
 
 			forces = add_vectors(forces, scalar_product(direction, force));
 		}
+		planet_forces[i] = forces;
+	}
+	for(int i = 0; i < count; i++ ) {
 		// a = f/m
-		struct vec3 direction = normalize(forces);
-		real accel = length(forces)/(real)p[i].mass;
+		struct vec3 direction = normalize(planet_forces[i]);
+		real accel = length(planet_forces[i])/(real)p[i].mass;
 		p[i].acceleration = scalar_product(direction, accel);
 	}
 }
@@ -104,7 +108,7 @@ int main(int argc, char const *argv[])
 	uint32_t now;
 	while(!quit) {
 		now = SDL_GetTicks();
-		delta_time = (double)(now - last_update)/1000.0f;
+		delta_time = (double)(now - last_update)/1000.0;
 		total += delta_time;
 		last_update = now;
 		
